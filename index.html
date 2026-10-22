@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מי יודע מה עושה הלב? – חידון גוף האדם</title>
+  <style>
+    :root {
+      --primary: #6b46c1;
+      --primary-light: #9f7aea;
+      --success: #38a169;
+      --error: #e53e3e;
+      --accent1: #ed64a6;
+      --accent2: #ed8936;
+      --accent3: #4299e1;
+      --bg: #faf5ff;
+      --card: #ffffff;
+      --text: #1a202c;
+      --muted: #718096;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fce7f3 0%, #e0e7ff 35%, #dbeafe 65%, #ccfbf1 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 16px;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+      padding-top: 12px;
+    }
+
+    header h1 {
+      font-size: 1.9rem;
+      background: linear-gradient(90deg, #6b46c1, #ed64a6, #ed8936);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+      font-weight: 800;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    /* Progress */
+    .progress-wrap {
+      background: #e2e8f0;
+      border-radius: 999px;
+      height: 14px;
+      overflow: hidden;
+      margin-bottom: 8px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ed64a6, #9f7aea, #4299e1, #38b2ac);
+      border-radius: 999px;
+      width: 0%;
+      transition: width 0.45s ease;
+      box-shadow: 0 0 10px rgba(159, 122, 234, 0.5);
+    }
+
+    .progress-text {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #4a5568;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 28px 24px;
+      box-shadow: 0 12px 40px rgba(107, 70, 193, 0.12);
+      margin-bottom: 20px;
+      border: 2px solid transparent;
+      background-image: linear-gradient(white, white), 
+                        linear-gradient(135deg, #ed64a6, #9f7aea, #4299e1);
+      background-origin: border-box;
+      background-clip: padding-box, border-box;
+    }
+
+    .emoji {
+      font-size: 3.4rem;
+      text-align: center;
+      margin-bottom: 14px;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    }
+
+    .question {
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 26px;
+      color: #2d3748;
+    }
+
+    /* Options */
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background: linear-gradient(135deg, #faf5ff, #f0f9ff);
+      border: 2px solid #e9d8fd;
+      border-radius: 16px;
+      padding: 15px 18px;
+      font-size: 1rem;
+      text-align: right;
+      cursor: pointer;
+      transition: all 0.22s ease;
+      color: var(--text);
+      line-height: 1.45;
+      font-weight: 500;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: #9f7aea;
+      background: linear-gradient(135deg, #f3e8ff, #e0f2fe);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(159, 122, 234, 0.2);
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    .option-btn.correct {
+      background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+      border-color: #38a169;
+      color: #22543d;
+      font-weight: 700;
+      box-shadow: 0 0 0 3px rgba(56, 161, 105, 0.25);
+    }
+
+    .option-btn.wrong {
+      background: linear-gradient(135deg, #fed7d7, #feb2b2);
+      border-color: #e53e3e;
+      color: #742a2a;
+      box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+    }
+
+    /* Feedback */
+    .feedback {
+      margin-top: 20px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      text-align: center;
+      font-weight: 700;
+      display: none;
+      font-size: 1.05rem;
+    }
+
+    .feedback.show {
+      display: block;
+    }
+
+    .feedback.correct {
+      background: linear-gradient(135deg, #c6f6d5, #9ae6b4);
+      color: #22543d;
+    }
+
+    .feedback.wrong {
+      background: linear-gradient(135deg, #fed7d7, #feb2b2);
+      color: #742a2a;
+    }
+
+    /* Next button */
+    .next-btn {
+      display: none;
+      width: 100%;
+      margin-top: 18px;
+      padding: 15px;
+      background: linear-gradient(90deg, #6b46c1, #ed64a6);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 6px 20px rgba(107, 70, 193, 0.35);
+    }
+
+    .next-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(107, 70, 193, 0.45);
+    }
+
+    .next-btn.show {
+      display: block;
+    }
+
+    /* Result screen */
+    #result-screen {
+      display: none;
+      text-align: center;
+    }
+
+    #result-screen .emoji {
+      font-size: 4.5rem;
+      margin-bottom: 10px;
+    }
+
+    #result-screen h2 {
+      font-size: 1.9rem;
+      background: linear-gradient(90deg, #6b46c1, #ed64a6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    #score-display {
+      font-size: 2.8rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #ed64a6, #9f7aea, #4299e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 16px 0;
+    }
+
+    #result-message {
+      font-size: 1.25rem;
+      color: #2d3748;
+      margin-bottom: 28px;
+      line-height: 1.55;
+      font-weight: 500;
+    }
+
+    .share-btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(90deg, #38a169, #48bb78);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 6px 18px rgba(56, 161, 105, 0.35);
+    }
+
+    .share-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(56, 161, 105, 0.45);
+    }
+
+    /* Confetti canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 32px;
+      font-size: 0.9rem;
+      color: #718096;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>❤️ מי יודע מה עושה הלב?</h1>
+      <p>חידון משעשע על תפקידי האברים בגוף האדם</p>
+    </header>
+
+    <!-- Progress -->
+    <div id="quiz-area">
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+      <div class="progress-text" id="progress-text">שאלה 1 מתוך 12</div>
+
+      <div class="card">
+        <div class="emoji" id="question-emoji">🧠</div>
+        <div class="question" id="question-text"></div>
+        <div class="options" id="options"></div>
+        <div class="feedback" id="feedback"></div>
+        <button class="next-btn" id="next-btn">השאלה הבאה ←</button>
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div id="result-screen" class="card">
+      <div class="emoji" id="result-emoji">🎉</div>
+      <h2>סיימת את החידון!</h2>
+      <div id="score-display"></div>
+      <div id="result-message"></div>
+      <button class="share-btn" id="share-btn">📋 העתק תוצאה לשיתוף</button>
+    </div>
+
+    <footer>
+      חידון גוף האדם · מוכן לשיתוף עם המשפחה והחברים 💜
+    </footer>
+  </div>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <script>
+    // ===== נתוני השאלות =====
+    const questions = [
+      {
+        emoji: "🧠",
+        question: "מהו תפקידו של המוח?",
+        correct: "בקרה וניהול פעילויות של מערכות הגוף, קבלת מידע ממערכות החישה ועיבודו",
+        options: [
+          "בקרה וניהול פעילויות של מערכות הגוף, קבלת מידע ממערכות החישה ועיבודו",
+          "משאבה שמזרימה דם עם חמצן וחומרים חיוניים לתאי הגוף",
+          "סינון הדם והפרשת תוצרי הפסולת לשתן",
+          "ייצור אינסולין ושליטה במאזן הסוכר"
+        ]
+      },
+      {
+        emoji: "❤️",
+        question: "מהו תפקידו של הלב?",
+        correct: "\"משאבה\" שפועלת ללא הפסקה ומספקת את הכוח המניע לדם שמוביל חמצן וחומרים חיוניים לתאי הגוף",
+        options: [
+          "\"משאבה\" שפועלת ללא הפסקה ומספקת את הכוח המניע לדם שמוביל חמצן וחומרים חיוניים לתאי הגוף",
+          "שאיפת אוויר ומסירת חמצן לדם, נשיפת פחמן דו-חמצני",
+          "האיבר הגדול ביותר בגוף – הגנה ואיזון חום",
+          "ספיגת מלחים ונוזלים משאריות המזון"
+        ]
+      },
+      {
+        emoji: "🫁",
+        question: "מהו תפקידן של הריאות?",
+        correct: "שאיפת אוויר ומסירת החמצן שבו אל תאי הדם האדומים, ונשיפה החוצה של פחמן דו-חמצני",
+        options: [
+          "שאיפת אוויר ומסירת החמצן שבו אל תאי הדם האדומים, ונשיפה החוצה של פחמן דו-חמצני",
+          "פירוק מכני וכימי של המזון באמצעות חומצות ואנזימים",
+          "ייצור נוגדנים ופינוי חיידקים ממחזור הדם",
+          "ניקוז נוזלים עודפים והחזרתם למחזור הדם"
+        ]
+      },
+      {
+        emoji: "🧪",
+        question: "מהו תפקידו של הכבד?",
+        correct: "\"מפעל כימי\" – הפיכת המזון לרכיבים חיוניים, סינון חיידקים ורעלים, ייצור מרה ואחסון סוכרים",
+        options: [
+          "\"מפעל כימי\" – הפיכת המזון לרכיבים חיוניים, סינון חיידקים ורעלים, ייצור מרה ואחסון סוכרים",
+          "בקרה וניהול פעילויות של מערכות הגוף",
+          "סינון הדם והפרשת פסולת לשתן",
+          "ספיגת רכיבי התזונה והויטמינים אל מחזור הדם"
+        ]
+      },
+      {
+        emoji: "🫘",
+        question: "מהו תפקידן של הכליות?",
+        correct: "סינון הדם והפרשת תוצרי הפסולת לשתן, ושמירה על מאזן מים ומלחים",
+        options: [
+          "סינון הדם והפרשת תוצרי הפסולת לשתן, ושמירה על מאזן מים ומלחים",
+          "משאבה שמזרימה דם לתאי הגוף",
+          "ייצור אינסולין ושליטה במאזן הסוכר",
+          "הגנה מפני חיידקים ופגיעות חיצוניות"
+        ]
+      },
+      {
+        emoji: "🥣",
+        question: "מהו תפקידה של הקיבה?",
+        correct: "פירוק מכני וכימי של המזון שמגיע מהפה באמצעות חומצות ואנזימים, והזרמה מבוקרת למעי",
+        options: [
+          "פירוק מכני וכימי של המזון שמגיע מהפה באמצעות חומצות ואנזימים, והזרמה מבוקרת למעי",
+          "שאיפת אוויר ומסירת חמצן לדם",
+          "ספיגת מלחים ונוזלים משאריות המזון",
+          "ייצור נוגדנים ופינוי חיידקים"
+        ]
+      },
+      {
+        emoji: "🧬",
+        question: "מהו תפקידו של המעי הדק?",
+        correct: "ביצוע רוב תהליך העיכול, סיום פירוק המזון וספיגת רכיבי התזונה והויטמינים אל מחזור הדם",
+        options: [
+          "ביצוע רוב תהליך העיכול, סיום פירוק המזון וספיגת רכיבי התזונה והויטמינים אל מחזור הדם",
+          "סינון הדם והפרשת פסולת לשתן",
+          "הפיכת המזון לרכיבים כימיים חיוניים וסינון רעלים",
+          "איזון חום הגוף והגנה מפני פגיעות"
+        ]
+      },
+      {
+        emoji: "🔄",
+        question: "מהו תפקידו של המעי הגס?",
+        correct: "קבלת שאריות המזון מהמעי הדק, ספיגת המלחים והנוזלים מהן והעברת הפסולת לכיוון פי הטבעת",
+        options: [
+          "קבלת שאריות המזון מהמעי הדק, ספיגת המלחים והנוזלים מהן והעברת הפסולת לכיוון פי הטבעת",
+          "פירוק מכני וכימי של המזון באמצעות חומצות",
+          "ייצור אינסולין ושליטה במאזן הסוכר",
+          "בקרה וניהול פעילויות של מערכות הגוף"
+        ]
+      },
+      {
+        emoji: "🛡️",
+        question: "מהו תפקידו של הטחול?",
+        correct: "חלק ממערכת החיסון – ייצור נוגדנים, פינוי חיידקים ממחזור הדם ובקרת איכות לתאי הדם האדומים",
+        options: [
+          "חלק ממערכת החיסון – ייצור נוגדנים, פינוי חיידקים ממחזור הדם ובקרת איכות לתאי הדם האדומים",
+          "שאיפת אוויר ומסירת חמצן לדם",
+          "סינון הדם והפרשת פסולת לשתן",
+          "ספיגת רכיבי התזונה והויטמינים"
+        ]
+      },
+      {
+        emoji: "🍬",
+        question: "מהו תפקידו של הלבלב?",
+        correct: "ייצור אינסולין ושליטה במאזן הסוכר בגוף",
+        options: [
+          "ייצור אינסולין ושליטה במאזן הסוכר בגוף",
+          "משאבה שמזרימה דם לתאי הגוף",
+          "הפיכת המזון לרכיבים כימיים חיוניים",
+          "ניקוז נוזלים עודפים והחזרתם לדם"
+        ]
+      },
+      {
+        emoji: "🧴",
+        question: "מהו תפקידו של העור?",
+        correct: "האיבר הגדול ביותר בגוף – משמש כמעטפת הגנה מפני חיידקים ופגיעות חיצוניות, ומאזן את חום הגוף",
+        options: [
+          "האיבר הגדול ביותר בגוף – משמש כמעטפת הגנה מפני חיידקים ופגיעות חיצוניות, ומאזן את חום הגוף",
+          "ביצוע רוב תהליך העיכול וספיגת רכיבי התזונה",
+          "ייצור נוגדנים ופינוי חיידקים",
+          "סינון הדם והפרשת פסולת לשתן"
+        ]
+      },
+      {
+        emoji: "💧",
+        question: "מהו תפקידה של מערכת הלימפה?",
+        correct: "חלק מרכזי במערכת החיסון ובמאזן הנוזלים – ניקוז נוזלים עודפים, החזרתם לדם וסינון חיידקים, וירוסים ומזהמים",
+        options: [
+          "חלק מרכזי במערכת החיסון ובמאזן הנוזלים – ניקוז נוזלים עודפים, החזרתם לדם וסינון חיידקים, וירוסים ומזהמים",
+          "פירוק מכני וכימי של המזון בקיבה",
+          "שאיפת אוויר ומסירת חמצן לדם",
+          "ייצור אינסולין ושליטה במאזן הסוכר"
+        ]
+      }
+    ];
+
+    // ===== מצב המשחק =====
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+
+    // ===== אלמנטים =====
+    const progressBar = document.getElementById("progress-bar");
+    const progressText = document.getElementById("progress-text");
+    const questionEmoji = document.getElementById("question-emoji");
+    const questionText = document.getElementById("question-text");
+    const optionsContainer = document.getElementById("options");
+    const feedback = document.getElementById("feedback");
+    const nextBtn = document.getElementById("next-btn");
+    const quizArea = document.getElementById("quiz-area");
+    const resultScreen = document.getElementById("result-screen");
+    const scoreDisplay = document.getElementById("score-display");
+    const resultMessage = document.getElementById("result-message");
+    const resultEmoji = document.getElementById("result-emoji");
+    const shareBtn = document.getElementById("share-btn");
+
+    // ===== פונקציות =====
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function loadQuestion() {
+      answered = false;
+      feedback.className = "feedback";
+      feedback.textContent = "";
+      nextBtn.classList.remove("show");
+
+      const q = questions[currentQuestion];
+      questionEmoji.textContent = q.emoji;
+      questionText.textContent = q.question;
+
+      const shuffled = shuffle(q.options);
+      optionsContainer.innerHTML = "";
+
+      shuffled.forEach((opt) => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt;
+        btn.addEventListener("click", () => selectAnswer(btn, opt, q.correct));
+        optionsContainer.appendChild(btn);
+      });
+
+      const percent = (currentQuestion / questions.length) * 100;
+      progressBar.style.width = percent + "%";
+      progressText.textContent = `שאלה ${currentQuestion + 1} מתוך ${questions.length}`;
+    }
+
+    function selectAnswer(btn, selected, correct) {
+      if (answered) return;
+      answered = true;
+
+      const allBtns = optionsContainer.querySelectorAll(".option-btn");
+      allBtns.forEach((b) => (b.disabled = true));
+
+      if (selected === correct) {
+        btn.classList.add("correct");
+        feedback.textContent = "✅ נכון מאוד!";
+        feedback.className = "feedback show correct";
+        score++;
+      } else {
+        btn.classList.add("wrong");
+        allBtns.forEach((b) => {
+          if (b.textContent === correct) b.classList.add("correct");
+        });
+        feedback.textContent = "❌ לא בדיוק... התשובה הנכונה מסומנת בירוק";
+        feedback.className = "feedback show wrong";
+      }
+
+      nextBtn.classList.add("show");
+      if (currentQuestion === questions.length - 1) {
+        nextBtn.textContent = "לתוצאות ←";
+      }
+    }
+
+    nextBtn.addEventListener("click", () => {
+      currentQuestion++;
+      if (currentQuestion < questions.length) {
+        loadQuestion();
+      } else {
+        showResults();
+      }
+    });
+
+    function showResults() {
+      quizArea.style.display = "none";
+      resultScreen.style.display = "block";
+
+      scoreDisplay.textContent = `${score} מתוך ${questions.length}`;
+
+      let message = "";
+      let emoji = "🎉";
+
+      if (score === 12) {
+        message = "וואו! אתה כמעט רופא! 🩺 ידע מושלם על גוף האדם!";
+        emoji = "🏆";
+        launchConfetti();
+      } else if (score >= 9) {
+        message = "מצוין! הגוף שלך גאה בך. ידע מרשים!";
+        emoji = "🌟";
+        launchConfetti();
+      } else if (score >= 6) {
+        message = "לא רע בכלל! עוד קצת ותרגיש את הדופק...";
+        emoji = "💪";
+      } else if (score >= 3) {
+        message = "הגוף שלך עדיין מחפש את המפה… כדאי לחזור על החומר 😉";
+        emoji = "🗺️";
+      } else {
+        message = "אוי... אולי כדאי לפתוח ספר אנטומיה קטן 😄";
+        emoji = "📚";
+      }
+
+      resultEmoji.textContent = emoji;
+      resultMessage.textContent = message;
+    }
+
+    shareBtn.addEventListener("click", () => {
+      const text = `סיימתי את החידון "מי יודע מה עושה הלב?" עם ציון ${score}/${questions.length}! 🧠❤️\nבואו תבדקו את עצמכם גם אתם 😊`;
+      navigator.clipboard.writeText(text).then(() => {
+        shareBtn.textContent = "✅ הועתק!";
+        setTimeout(() => {
+          shareBtn.textContent = "📋 העתק תוצאה לשיתוף";
+        }, 2000);
+      });
+    });
+
+    // ===== קונפטי =====
+    function launchConfetti() {
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const pieces = [];
+      const colors = ["#ed64a6", "#9f7aea", "#4299e1", "#48bb78", "#ed8936", "#f56565", "#38b2ac"];
+
+      for (let i = 0; i < 140; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height - canvas.height,
+          w: Math.random() * 12 + 5,
+          h: Math.random() * 7 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speed: Math.random() * 3.5 + 2,
+          angle: Math.random() * 360,
+          spin: Math.random() * 0.25 - 0.12
+        });
+      }
+
+      let frame = 0;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach((p) => {
+          p.y += p.speed;
+          p.angle += p.spin;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.angle * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.restore();
+        });
+        frame++;
+        if (frame < 200) requestAnimationFrame(animate);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      animate();
+    }
+
+    // התחלה
+    loadQuestion();
+  </script>
+</body>
+</html>
